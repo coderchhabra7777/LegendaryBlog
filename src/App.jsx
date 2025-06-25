@@ -9,6 +9,7 @@ import Footer from './components/layout/Footer'
 
 // Pages
 import Home from './pages/Home'
+import AllBlogs from './pages/AllBlogs'
 import BlogDetail from './pages/BlogDetail'
 import CreateBlog from './pages/CreateBlog'
 import EditBlog from './pages/EditBlog'
@@ -50,6 +51,7 @@ function App() {
           <Routes>
             {/* Public routes */}
             <Route path="/" element={<Home />} />
+            <Route path="/blogs" element={<AllBlogs />} />
             <Route path="/blog/:id" element={<BlogDetail />} />
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />

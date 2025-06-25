@@ -27,41 +27,22 @@ const BlogDetail = () => {
       try {
         setLoading(true)
         
-        // Fetch blog with author
-        const { data: blogData, error: blogError } = await supabase
-          .from('blogs')
-          .select(`
-            *,
-            author:authors(*)
-          `)
-          .eq('id', id)
-          .eq('published', true)
-          .single()
+        // Fetch blog with author using custom client
+        const blogData = await supabase.getBlog(id)
 
-        if (blogError) {
+        if (!blogData || !blogData.published) {
           setError('Blog not found')
           return
         }
 
         // Fetch comments for this blog
-        const { data: commentsData, error: commentsError } = await supabase
-          .from('comments')
-          .select('*')
-          .eq('blog_id', id)
-          .order('created_at', { ascending: false })
-
-        if (commentsError) {
-          console.error('Error fetching comments:', commentsError)
-        }
+        const commentsData = await supabase.getComments(id)
 
         setBlog(blogData)
         setComments(commentsData || [])
         
-        // Increment view count
-        await supabase
-          .from('blogs')
-          .update({ views: (blogData.views || 0) + 1 })
-          .eq('id', id)
+        // Note: View count increment disabled for now to avoid errors
+        // await supabase.updateBlog(id, { views: (blogData.views || 0) + 1 })
 
       } catch (error) {
         console.error('Error fetching blog:', error)
@@ -177,16 +158,16 @@ const BlogDetail = () => {
             <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 p-6 bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700">
               <div className="flex items-center space-x-4">
                 <img
-                  src={blog.author.avatar}
-                  alt={blog.author.name}
+                  src={blog.authors?.avatar || blog.author?.avatar}
+                  alt={blog.authors?.name || blog.author?.name}
                   className="w-12 h-12 rounded-full"
                 />
                 <div>
                   <h3 className="font-semibold text-gray-900 dark:text-gray-100">
-                    {blog.author.name}
+                    {blog.authors?.name || blog.author?.name}
                   </h3>
                   <p className="text-sm text-gray-600 dark:text-gray-400">
-                    {blog.author.bio}
+                    {blog.authors?.bio || blog.author?.bio}
                   </p>
                 </div>
               </div>

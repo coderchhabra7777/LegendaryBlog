@@ -62,11 +62,20 @@ class SupabaseClient {
   }
 
   async getBlog(id) {
-    const blogs = await this.query('blogs', {
-      select: '*, authors(*), comments(*)',
-      filters: { id }
-    })
-    return blogs[0]
+    try {
+      // Use the same method as getBlogs but filter by ID
+      const allBlogs = await this.getBlogs()
+      const blog = allBlogs.find(blog => blog.id === id && blog.published)
+      
+      if (!blog) {
+        throw new Error('Blog not found')
+      }
+      
+      return blog
+    } catch (error) {
+      console.error('Error fetching blog:', error)
+      throw error
+    }
   }
 
   async createBlog(blogData) {
@@ -77,10 +86,24 @@ class SupabaseClient {
   }
 
   async updateBlog(id, updates) {
-    return this.query(`blogs?id=eq.${id}`, {
-      method: 'PATCH',
-      data: updates
-    })
+    try {
+      const url = `${this.url}/rest/v1/blogs?id=eq.${id}`
+      
+      const response = await fetch(url, {
+        method: 'PATCH',
+        headers: this.headers,
+        body: JSON.stringify(updates)
+      })
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`)
+      }
+      
+      return await response.json()
+    } catch (error) {
+      console.error('Error updating blog:', error)
+      throw error
+    }
   }
 
   async deleteBlog(id) {
@@ -106,9 +129,23 @@ class SupabaseClient {
 
   // Comment operations
   async getComments(blogId) {
-    return this.query('comments', {
-      filters: { blog_id: blogId }
-    })
+    try {
+      const url = `${this.url}/rest/v1/comments?blog_id=eq.${blogId}&order=created_at.desc`
+      
+      const response = await fetch(url, {
+        method: 'GET',
+        headers: this.headers
+      })
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`)
+      }
+      
+      return await response.json()
+    } catch (error) {
+      console.error('Error fetching comments:', error)
+      return []
+    }
   }
 
   async createComment(commentData) {
