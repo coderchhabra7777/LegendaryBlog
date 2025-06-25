@@ -16,78 +16,7 @@ import {
 } from 'lucide-react'
 import { useBlogStore } from '../store/useStore'
 import { format } from 'date-fns'
-
-// Mock data for demonstration
-const mockBlogs = [
-  {
-    id: '1',
-    title: 'Getting Started with React and Modern Web Development',
-    excerpt: 'Learn the fundamentals of React and how to build modern, scalable web applications with the latest tools and best practices.',
-    content: 'Full content here...',
-    author: {
-      id: '1',
-      name: 'John Doe',
-      avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=32&h=32&fit=crop&crop=face',
-      bio: 'Frontend Developer'
-    },
-    coverImage: 'https://images.unsplash.com/photo-1633356122544-f134324a6cee?w=800&h=400&fit=crop',
-    tags: ['React', 'JavaScript', 'Web Development'],
-    createdAt: '2024-01-15T10:00:00Z',
-    updatedAt: '2024-01-15T10:00:00Z',
-    views: 1250,
-    likes: 89,
-    comments: [
-      { id: '1', content: 'Great article!', author: 'Jane Smith' },
-      { id: '2', content: 'Very helpful, thanks!', author: 'Bob Johnson' }
-    ],
-    readTime: 8,
-    featured: true
-  },
-  {
-    id: '2',
-    title: 'The Future of AI in Software Development',
-    excerpt: 'Exploring how artificial intelligence is transforming the way we write code and build applications.',
-    content: 'Full content here...',
-    author: {
-      id: '2',
-      name: 'Sarah Wilson',
-      avatar: 'https://images.unsplash.com/photo-1494790108755-2616b612b786?w=32&h=32&fit=crop&crop=face',
-      bio: 'AI Researcher'
-    },
-    coverImage: 'https://images.unsplash.com/photo-1677442136019-21780ecad995?w=800&h=400&fit=crop',
-    tags: ['AI', 'Machine Learning', 'Technology'],
-    createdAt: '2024-01-14T15:30:00Z',
-    updatedAt: '2024-01-14T15:30:00Z',
-    views: 2100,
-    likes: 156,
-    comments: [
-      { id: '3', content: 'Fascinating insights!', author: 'Mike Chen' }
-    ],
-    readTime: 12,
-    featured: false
-  },
-  {
-    id: '3',
-    title: 'Building Scalable APIs with Node.js and Express',
-    excerpt: 'A comprehensive guide to creating robust, scalable backend services using Node.js and Express framework.',
-    content: 'Full content here...',
-    author: {
-      id: '3',
-      name: 'Alex Rodriguez',
-      avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=32&h=32&fit=crop&crop=face',
-      bio: 'Backend Engineer'
-    },
-    coverImage: 'https://images.unsplash.com/photo-1558494949-ef010cbdcc31?w=800&h=400&fit=crop',
-    tags: ['Node.js', 'Express', 'Backend', 'API'],
-    createdAt: '2024-01-13T09:15:00Z',
-    updatedAt: '2024-01-13T09:15:00Z',
-    views: 890,
-    likes: 67,
-    comments: [],
-    readTime: 15,
-    featured: false
-  }
-]
+import { supabase } from '../lib/supabase'
 
 const Home = () => {
   const { 
@@ -105,11 +34,57 @@ const Home = () => {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    // Simulate API call
-    setTimeout(() => {
-      setBlogs(mockBlogs)
-      setLoading(false)
-    }, 1000)
+    const fetchBlogs = async () => {
+      try {
+        setLoading(true)
+        
+        // Fetch blogs with authors
+        const { data: blogsData, error } = await supabase
+          .from('blogs')
+          .select(`
+            *,
+            author:authors(*)
+          `)
+          .eq('published', true)
+          .order('created_at', { ascending: false })
+
+        if (error) {
+          console.error('Error fetching blogs:', error)
+          return
+        }
+
+        // Transform the data to match the expected format
+        const transformedBlogs = blogsData.map(blog => ({
+          id: blog.id,
+          title: blog.title,
+          excerpt: blog.excerpt,
+          content: blog.content,
+          author: {
+            id: blog.author.id,
+            name: blog.author.name,
+            avatar: blog.author.avatar,
+            bio: blog.author.bio
+          },
+          coverImage: blog.cover_image,
+          tags: blog.tags || [],
+          createdAt: blog.created_at,
+          updatedAt: blog.updated_at,
+          views: blog.views || 0,
+          likes: blog.likes || 0,
+          comments: [], // We'll fetch comments separately if needed
+          readTime: blog.read_time || 5,
+          featured: blog.featured || false
+        }))
+
+        setBlogs(transformedBlogs)
+      } catch (error) {
+        console.error('Error fetching blogs:', error)
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchBlogs()
   }, [setBlogs])
 
   const filteredBlogs = getFilteredBlogs()
