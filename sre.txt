@@ -1,0 +1,81 @@
+PROJECT NAME:
+LegendaryBlog - A Clean, Powerful Blogging Platform
+
+OBJECTIVE:
+Build a modern blogging platform where users can write, read, and interact with quality blogs. Focus on performance, UX, and engagement.
+
+TECH STACK:
+- Frontend: React.js (Tailwind CSS, Framer Motion)
+- Backend: Node.js + Express OR Go
+- Database: MongoDB / SQLite (optional for local or Netlify-only deployment: Markdown + JSON storage)
+- Deployment: Netlify (Frontend), Render/Vercel (API if needed)
+
+CORE FEATURES:
+1. 📝 Blog Editor
+   - Rich text editor (Markdown support)
+   - Auto-save drafts
+   - Upload cover image (with preview)
+   - Tags input and category dropdown
+   - Word count and estimated read time
+
+2. 📚 Blog Feed
+   - Infinite scroll or pagination
+   - Filter by tags, search by title
+   - Trending & latest tabs
+   - Like, comment, and bookmark system
+
+3. 👤 User System
+   - Sign up / Login (JWT or third-party OAuth)
+   - Profile page with bio, social links, and written blogs
+   - Reading history and saved posts
+
+4. 📊 Admin Panel
+   - View analytics (views, likes, comments)
+   - Manage posts (edit/delete)
+   - Highlight or feature specific blogs
+
+5. 🧠 SEO + Performance
+   - SEO-optimized blog pages (OpenGraph, Meta)
+   - Sitemap and robots.txt
+   - Lazy loading for images
+   - SSR support via Next.js (optional)
+
+6. 💬 Engagement
+   - Comments (with markdown and nested replies)
+   - Likes/upvotes per post
+   - Featured comments section
+   - Newsletter subscription integration (Mailchimp / ConvertKit)
+
+7. 🔒 Security
+   - Rate limiting on APIs
+   - XSS and CSRF protection
+   - JWT refresh tokens
+
+8. 🌙 UI/UX Extras
+   - Dark mode toggle
+   - Animated transitions (Framer Motion)
+   - Mobile responsive (PWA optional)
+   - Loading skeletons and smooth navigation
+
+OPTIONAL POWER FEATURES:
+- AI writing assistant (basic prompt-based idea generation)
+- Reading list with progress bars
+- Blogging challenges / streaks (gamification)
+- Custom domain support
+- Offline writing support
+
+DEPLOYMENT & STORAGE OPTIONS:
+- Markdown/JSON file-based blog storage for Netlify-only version
+- MongoDB Atlas for full dynamic backend
+
+GIT STRUCTURE:
+/frontend - React project  
+/backend  - Express or Go APIs  
+/data     - JSON or Markdown posts (if static)  
+
+SUCCESS METRICS:
+- Fast TTFB (<200ms)
+- Lighthouse score > 95
+- <500ms API response
+- 90% mobile-friendly layout
+- <1s Largest Contentful Paint
