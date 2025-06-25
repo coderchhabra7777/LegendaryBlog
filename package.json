@@ -1,6 +1,7 @@
 {
   "name": "legendary-blog",
   "version": "1.0.0",
+  "type": "module",
   "description": "A Clean, Powerful Blogging Platform",
   "main": "index.js",
   "scripts": {
